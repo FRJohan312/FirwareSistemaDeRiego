@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Riego Hidropónico - Dashboard</title>
+<title>Aerofertil - Dashboard</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
@@ -83,6 +83,13 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;margin:0;padding:0;m
 .theme-btn:hover{background:var(--g100);border-color:var(--g300)}
 .shortcut-hint{font-size:.7em;color:var(--td);background:var(--g100);padding:2px 7px;border-radius:4px;font-weight:500}
 
+/* BADGES DE TIPO */
+.badge-tipo{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:.72em;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.badge-tipo.torre{background:rgba(37,99,235,.12);color:var(--i)}
+.badge-tipo.tabla{background:rgba(22,101,52,.12);color:var(--p)}
+.dark .badge-tipo.torre{background:rgba(96,165,250,.2);color:#93c5fd}
+.dark .badge-tipo.tabla{background:rgba(34,197,94,.2);color:#86efac}
+
 /* BREADCRUMB */
 .bread{display:flex;align-items:center;gap:6px;font-size:.78em;color:var(--td);margin-bottom:16px}
 .bread span{color:var(--tm)}.bread .sep{opacity:.4}
@@ -103,18 +110,42 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;margin:0;padding:0;m
 .row{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px}
 .col{flex:1;min-width:180px}
 
-/* DEVICE BAR */
-.dev-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.dev-bar select{min-width:190px}
+/* DEVICE BAR & FILTER CHIPS */
+.dev-bar{display:flex;flex-direction:column;gap:12px}
+.dev-filter-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--bd);padding-bottom:12px}
+.dev-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 12px;border-radius:20px;font-size:.78em;font-weight:600;border:1px solid var(--g300);
+  background:transparent;color:var(--td);cursor:pointer;transition:all var(--t);display:inline-flex;align-items:center;gap:5px}
+.chip:hover{background:var(--g100);color:var(--tb)}
+.chip.active{background:var(--p);color:#fff;border-color:var(--p);box-shadow:0 2px 6px rgba(22,101,52,.25)}
+.chip .chip-count{font-size:.85em;opacity:.85;padding:1px 6px;border-radius:10px;background:rgba(255,255,255,.2)}
+.chip:not(.active) .chip-count{background:var(--g200);color:var(--tb)}
+
+.dev-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dev-controls select{min-width:240px;flex:1}
 .dev-st{display:inline-flex;align-items:center;gap:6px;font-size:.82em;color:var(--td)}
 .dev-st .dot{width:8px;height:8px;border-radius:50%;background:var(--g300)}
 .dev-st .dot.ok{background:var(--p);box-shadow:0 0 6px rgba(34,197,94,.4)}
 .dev-st .dot.warn{background:var(--w);box-shadow:0 0 6px rgba(245,158,11,.4)}
 .dev-st .dot.err{background:var(--d);box-shadow:0 0 6px rgba(239,68,68,.4)}
+.dev-search{position:relative;display:inline-flex;align-items:center}
+.dev-search input{padding:8px 28px 8px 12px;width:200px}
+.dev-clear{position:absolute;right:8px;background:none;border:none;color:var(--g500);cursor:pointer;font-size:1.05em;line-height:1;padding:2px 4px;border-radius:4px;transition:color var(--t)}
+.dev-clear:hover{color:var(--d)}
+.dev-count{font-size:.72em;font-weight:600;color:var(--g500);background:var(--g100);padding:3px 9px;border-radius:20px;white-space:nowrap}
+#selDevice optgroup{font-weight:700;color:var(--g600);background:var(--g50)}
+#selDevice option.opt-ok{color:#166534}.dark #selDevice option.opt-ok{color:#86efac}
+#selDevice option.opt-warn{color:#b45309}.dark #selDevice option.opt-warn{color:#fcd34d}
+#selDevice option.opt-err{color:#b91c1c}.dark #selDevice option.opt-err{color:#fca5a5}
 .last-upd{font-size:.78em;color:var(--td);margin-left:auto;white-space:nowrap;display:flex;align-items:center;gap:6px}
 .refresh-btn{display:inline-flex;align-items:center;gap:4px;font-size:.78em;color:var(--td);
   cursor:pointer;transition:color var(--t);background:none;border:none;padding:2px 6px;border-radius:4px}
 .refresh-btn:hover{color:var(--p);background:var(--pb)}
+
+/* BANNER DE TIPO DE DISPOSITIVO */
+.dev-mode-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--rs);
+  background:var(--g100);border:1px solid var(--bd);margin-bottom:16px;font-size:.85em;color:var(--tb)}
+.dev-mode-banner .icon{font-size:1.3em}
 
 /* METRIC CARDS */
 .mc{position:relative;padding:0;overflow:hidden;min-width:0;border-radius:var(--rm)}
@@ -138,6 +169,8 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;margin:0;padding:0;m
 .mc.last .card-bd::before{background:linear-gradient(90deg,#647864,#a8b8a8)}
 .mc.last .lbl{color:var(--g500)}.mc.last .val{font-size:1.8em;color:var(--g600)}
 .dark .mc.last .val{color:var(--g600)}.mc.last .sub{font-size:.85em}
+.mc.temp .card-bd::before{background:linear-gradient(90deg,#d97706,#f59e0b)}
+.mc.humA .card-bd::before{background:linear-gradient(90deg,#0284c7,#38bdf8)}
 .pulse-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:2px;vertical-align:middle}
 .pulse-dot.on{background:var(--d);box-shadow:0 0 0 0 rgba(220,38,38,.5);animation:pulse-ring 1.5s ease-in-out infinite}
 .pulse-dot.off{background:var(--g300)}
@@ -214,6 +247,7 @@ tr:hover td{background:var(--g50)}
 .chart-st{display:flex;gap:16px 24px;flex-wrap:wrap;margin-top:14px;padding:12px 0 0;font-size:.8em;color:var(--td)}
 .chart-st span{display:flex;align-items:center;gap:5px}
 .chart-st strong{color:var(--g600);font-weight:600}
+.chart-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:240px;color:var(--td);text-align:center;gap:10px;padding:20px}
 
 /* TOAST */
 #toast-container{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column-reverse;gap:8px;pointer-events:none}
@@ -237,13 +271,6 @@ tr:hover td{background:var(--g50)}
 .modal-bd{padding:12px 24px 20px;font-size:.9em;color:var(--g600);line-height:1.5}
 .modal-ftr{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end}
 
-/* SKELETON */
-.skel{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 50%,var(--g100) 75%);background-size:200% 100%;
-  animation:skel 1.5s ease infinite;border-radius:var(--rs)}
-@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.skel-row{display:flex;gap:18px;flex-wrap:wrap}.skel-card{flex:1;min-width:180px;height:200px;border-radius:var(--rm)}
-.skel-chart{height:300px;border-radius:var(--rm);margin-bottom:18px}
-
 /* LOADING */
 #loading{text-align:center;padding:80px 20px;color:var(--td);font-size:1em;display:flex;flex-direction:column;
   align-items:center;gap:16px;position:fixed;inset:0;background:var(--bp);z-index:200;justify-content:center;
@@ -251,6 +278,19 @@ tr:hover td{background:var(--g50)}
 .spinner{width:40px;height:40px;border:3px solid var(--g200);border-top-color:var(--p);
   border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* LECTURAS TOGGLES */
+.lec-tgl{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.lec-t{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--rs);border:1px solid var(--g300);
+  background:var(--bc);cursor:pointer;font-size:.85em;font-weight:600;font-family:inherit;color:var(--g600);
+  transition:all var(--t);user-select:none}
+.lec-t .sw{width:34px;height:18px;border-radius:20px;background:var(--g300);position:relative;transition:background var(--t);flex-shrink:0}
+.lec-t .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left var(--t);box-shadow:var(--ss)}
+.lec-t.on{border-color:var(--p);color:var(--p)}
+.lec-t.on .sw{background:var(--p)}
+.lec-t.on .sw::after{left:18px}
+.lec-t:hover{border-color:var(--g400)}
+.lec-hint{font-size:.78em;color:var(--g500);margin-top:8px}
 .hidden{display:none!important}
 hr{border:none;border-top:1px solid var(--g200);margin:12px 0}
 .empty{padding:12px 0;text-align:center;color:var(--td);font-style:italic;font-size:.9em}
@@ -261,18 +301,14 @@ hr{border:none;border-top:1px solid var(--g200);margin:12px 0}
 .shortcuts-panel kbd{display:inline-block;padding:2px 8px;background:var(--g100);border-radius:4px;font-size:.82em;font-family:inherit;font-weight:600;min-width:24px;text-align:center}
 .shortcuts-panel .sc-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:.88em}
 
-/* PRINT */
-@media print{body{background:#fff!important}.topbar,.sidebar,#toast-container,#modal-overlay,#loading{display:none!important}
-  .layout{display:block}.content{padding:0!important;max-width:100%}.tab-section{display:block!important}
-  .card{break-inside:avoid;box-shadow:none!important;border:1px solid #ddd!important}.btn,.refresh-btn{display:none!important}}
-
 /* RESPONSIVE */
 @media(max-width:768px){
   .sidebar{position:fixed;left:0;top:60px;bottom:0;z-index:50;box-shadow:var(--sl);transform:translateX(0);transition:transform var(--t)}
   .sidebar.collapsed{transform:translateX(-100%);width:var(--sw);padding:12px}
   .sidebar.collapsed .sbtn span{display:inline}
   .content{padding:16px}.row{flex-direction:column;gap:12px}.col{min-width:100%}
-  .dev-bar{flex-direction:column;align-items:stretch}.dev-bar select{width:100%}
+  .dev-controls{flex-direction:column;align-items:stretch}.dev-controls select{width:100%}
+  .dev-search input{width:100%}
   .last-upd{margin-left:0}.chart-c .chart-w{height:220px;margin:0 -16px -16px}
   .rng-sel{width:100%}.rng-sel button{flex:1;text-align:center}.badge{display:none}
 }
@@ -286,9 +322,11 @@ hr{border:none;border-top:1px solid var(--g200);margin:12px 0}
 
 <div class="topbar">
   <button class="hamburger" id="hamBtn" aria-label="Menú">☰</button>
-  <div class="topbar-brand"><div class="logo">🌱</div>Riego Hidropónico</div>
+  <div class="topbar-brand"><div class="logo">🌱</div>Aerofertil</div>
   <div class="topbar-right">
-    <span class="badge" id="devBadge">Sin dispositivo</span>
+    <div id="devBadgeContainer">
+      <span class="badge" id="devBadge">Sin dispositivo</span>
+    </div>
     <span class="shortcut-hint" title="Atajos de teclado"><kbd>?</kbd></span>
     <button class="theme-btn" id="themeBtn" aria-label="Modo oscuro">🌙</button>
   </div>
@@ -314,12 +352,35 @@ hr{border:none;border-top:1px solid var(--g200);margin:12px 0}
       <div class="card" style="margin-bottom:16px">
         <div class="card-bd">
           <div class="dev-bar">
-            <label style="font-weight:500;font-size:.85em;color:var(--g500);display:flex;align-items:center;gap:8px">Dispositivo
+            <!-- CHIPS DE FILTRO POR TIPO -->
+            <div class="dev-filter-row">
+              <div class="dev-chips">
+                <button class="chip active" data-filter="all">Todos <span class="chip-count" id="countAll">0</span></button>
+                <button class="chip" data-filter="1torre">🗼 Torres Individuales <span class="chip-count" id="countTorre">0</span></button>
+                <button class="chip" data-filter="20torres">🌿 Sistemas de Tabla <span class="chip-count" id="countTabla">0</span></button>
+              </div>
+              <div class="dev-search">
+                <input type="text" id="searchDev" placeholder="Buscar nombre o MAC..." autocomplete="off">
+                <button class="dev-clear" id="clearSearch" title="Limpiar búsqueda">×</button>
+              </div>
+            </div>
+
+            <!-- SELECTOR DE DISPOSITIVOS -->
+            <div class="dev-controls">
               <select id="selDevice"></select>
-            </label>
-            <span class="dev-st" id="devStatus"><span class="dot"></span> <span id="devStText">Conectando...</span></span>
-            <span class="last-upd"><span id="ultUpd"></span><button class="refresh-btn" onclick="cargarTodo()">⟳</button></span>
+              <span class="dev-st" id="devStatus"><span class="dot"></span> <span id="devStText">Conectando...</span></span>
+              <span class="last-upd"><span id="ultUpd"></span><button class="refresh-btn" onclick="cargarTodo()" title="Refrescar">⟳</button></span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <!-- BANNER INFORMATIVO SEGÚN TIPO -->
+      <div id="devTypeBanner" class="dev-mode-banner">
+        <span class="icon" id="bannerIcon">🗼</span>
+        <div>
+          <strong id="bannerTitle">Torre Individual</strong>
+          <div style="font-size:.9em;color:var(--g500)" id="bannerDesc">Control de bomba y programación de horarios por ciclos de tiempo (sincronizado con NTP).</div>
         </div>
       </div>
 
@@ -327,57 +388,117 @@ hr{border:none;border-top:1px solid var(--g200);margin:12px 0}
 
       <!-- RESUMEN -->
       <div class="tab-section active" data-tab="resumen">
+        <!-- SENSORES (OCULTOS O VISIBLES SEGÚN TIPO Y LECTURAS) -->
+        <div class="row" id="sensorGrid">
+          <div class="col card mc hum" id="cardHum"><div class="card-bd"><div class="lbl">💧 Humedad suelo</div><div class="gw" id="gHum"></div></div></div>
+          <div class="col card mc tds" id="cardTds"><div class="card-bd"><div class="lbl">🧪 Solución TDS</div><div class="gw" id="gTds"></div></div></div>
+          <div class="col card mc temp" id="cardTemp"><div class="card-bd"><div class="lbl">🌡️ Temp ambiente</div><div class="gw" id="gTemp"></div></div></div>
+          <div class="col card mc humA" id="cardHumA"><div class="card-bd"><div class="lbl">💧 Hum ambiente</div><div class="gw" id="gHumA"></div></div></div>
+        </div>
+
+        <!-- BOMBA Y ESTADO -->
         <div class="row">
-          <div class="col card mc hum"><div class="card-bd"><div class="lbl">💧 Humedad</div><div class="gw" id="gHum"></div></div></div>
-          <div class="col card mc tds"><div class="card-bd"><div class="lbl">🧪 TDS</div><div class="gw" id="gTds"></div></div></div>
-          <div class="col card mc pump"><div class="card-bd"><div class="lbl">⚙️ Bomba</div><div class="pump-bd"><div class="val off" id="vBomba">APAGADA</div><div class="sub" id="bDet"><span class="pulse-dot off"></span> Motivo: ---</div></div></div></div>
-          <div class="col card mc last"><div class="card-bd"><div class="lbl">🌿 Último riego</div><div class="val" id="vRiego">--</div><div class="sub" id="rSub">---</div></div></div>
+          <div class="col card mc pump"><div class="card-bd"><div class="lbl">⚙️ Bomba de riego</div><div class="pump-bd"><div class="val off" id="vBomba">APAGADA</div><div class="sub" id="bDet"><span class="pulse-dot off"></span> Motivo: ---</div></div></div></div>
+          <div class="col card mc last"><div class="card-bd"><div class="lbl">🌿 Último riego registrado</div><div class="val" id="vRiego">--</div><div class="sub" id="rSub">---</div></div></div>
         </div>
       </div>
 
       <!-- CONTROL -->
       <div class="tab-section" data-tab="control">
         <div class="row">
-          <div class="col card"><div class="card-bd"><div class="card-hdr"><h3>Control de bomba</h3></div>
+          <!-- CONTROL MANUAL -->
+          <div class="col card"><div class="card-bd"><div class="card-hdr"><h3>Accionamiento de bomba</h3></div>
             <div class="btn-g"><button id="bBtn" class="btn btn-p" onclick="cBomba()">ENCENDER BOMBA</button><button class="btn btn-d" onclick="cReset()">Reiniciar ESP</button></div>
             <hr><button id="mBtn" class="btn btn-w" onclick="tMant()">MANTENIMIENTO OFF</button></div></div>
-          <div class="col card"><div class="card-bd"><div class="card-hdr"><h3>Configuración</h3></div>
-            <div class="cfg-g"><div class="cfg-r"><label>Umbral</label><input type="number" id="cfgU" min="0" max="100" class="cfg-i"> %</div>
-            <div class="cfg-r"><label>Intervalo</label><input type="number" id="cfgI" min="1" max="48" class="cfg-i"> h</div>
-            <div class="cfg-r"><label>Duración</label><input type="number" id="cfgD" min="5" max="300" class="cfg-i"> s</div>
-            <div class="cfg-r"><label>Cal TDS</label><input type="number" id="cfgT" step="0.1" min="0.1" max="5" class="cfg-i" style="width:70px"></div>
-            <button class="btn btn-p btn-s" onclick="gConfig()" style="align-self:flex-start;margin-top:2px">Guardar</button></div></div></div>
-          <div class="col card"><div class="card-bd"><div class="card-hdr"><h3>Horarios</h3></div>
+          
+          <!-- CONFIGURACIÓN DE PARÁMETROS (ADAPTATIVA) -->
+          <div class="col card" id="cardConfigSens"><div class="card-bd"><div class="card-hdr"><h3>Parámetros de riego</h3></div>
+            <div id="cfgSensoresFields">
+              <div class="cfg-g">
+                <div class="cfg-r" id="cfgRowU"><label>Umbral</label><input type="number" id="cfgU" min="0" max="100" class="cfg-i"> %</div>
+                <div class="cfg-r" id="cfgRowI"><label>Intervalo</label><input type="number" id="cfgI" min="1" max="48" class="cfg-i"> h</div>
+                <div class="cfg-r" id="cfgRowD"><label>Duración</label><input type="number" id="cfgD" min="5" max="300" class="cfg-i"> s</div>
+                <div class="cfg-r" id="cfgRowT"><label>Cal TDS</label><input type="number" id="cfgT" step="0.1" min="0.1" max="5" class="cfg-i" style="width:70px"></div>
+                <button class="btn btn-p btn-s" onclick="gConfig()" style="align-self:flex-start;margin-top:2px">Guardar parámetros</button>
+              </div>
+            </div>
+            <div id="cfgTorreNotice" class="hidden" style="font-size:.85em;color:var(--g500);line-height:1.5">
+              Esta torre opera de manera autónoma mediante <strong>Horarios de Riego programados</strong>. No requiere umbrales de humedad analógica.
+            </div>
+          </div></div>
+
+          <!-- HORARIOS PROGRAMADOS -->
+          <div class="col card"><div class="card-bd"><div class="card-hdr"><h3>Horarios programados</h3></div>
             <div id="lHorarios"><p class="empty">Sin horarios</p></div>
-            <div class="sch-i"><input type="number" id="schH" min="0" max="23" placeholder="Hr">
-            <input type="number" id="schM" min="0" max="59" placeholder="Min">
-            <input type="number" id="schD" min="5" max="300" placeholder="Dur s">
-            <button class="btn btn-p btn-i" onclick="aHorario()">+</button></div></div></div>
+            <div class="sch-i">
+              <input type="number" id="schH" min="0" max="23" placeholder="Hora (0-23)" style="width:65px">
+              <input type="number" id="schM" min="0" max="59" placeholder="Min (0-59)" style="width:65px">
+              <input type="number" id="schD" min="5" max="3600" placeholder="Duración (s)" style="width:90px">
+              <button class="btn btn-p btn-i" onclick="aHorario()" title="Agregar horario">+</button>
+            </div>
+          </div></div>
         </div>
+
+        <!-- LECTURAS REGISTRADAS -->
+        <div class="card" id="cardLecturasTgl"><div class="card-bd"><div class="card-hdr"><h3>Sensores y lecturas habilitadas</h3></div>
+          <div style="font-size:.85em;color:var(--g500)">Habilita o desactiva variables de telemetría para este dispositivo específico.</div>
+          <div class="lec-tgl" id="lecTgl"></div>
+          <div class="lec-hint" id="lecHint"></div>
+        </div></div>
       </div>
 
       <!-- GRÁFICO -->
       <div class="tab-section" data-tab="grafico">
-        <div class="card chart-c"><div class="card-bd"><div class="card-hdr"><h3>Lecturas</h3>
-          <div class="rng-sel"><button class="rng-btn active" data-r="1">Día</button><button class="rng-btn" data-r="7">Semana</button><button class="rng-btn" data-r="30">Mes</button><button class="rng-btn" data-r="365">Año</button></div></div></div>
-          <div class="chart-w"><canvas id="chartL"></canvas></div></div>
+        <div class="card chart-c"><div class="card-bd">
+          <div class="card-hdr">
+            <h3>Historial de variables ambientales</h3>
+            <div class="rng-sel">
+              <button class="rng-btn active" data-r="1">Día</button>
+              <button class="rng-btn" data-r="7">Semana</button>
+              <button class="rng-btn" data-r="30">Mes</button>
+              <button class="rng-btn" data-r="365">Año</button>
+            </div>
+          </div>
+          <div class="chart-w">
+            <canvas id="chartL"></canvas>
+            <div id="chartPlaceholder" class="chart-placeholder hidden">
+              <span style="font-size:2em">📊</span>
+              <div><strong>Sin telemetría analógica para este dispositivo</strong></div>
+              <div style="font-size:.85em">Las torres individuales operan mediante horarios y ciclos de encendido/apagado de bomba. Puedes consultar los eventos en la pestaña <strong>Avanzado &gt; Historial de riegos</strong>.</div>
+            </div>
+          </div>
+        </div></div>
       </div>
 
       <!-- AVANZADO -->
       <div class="tab-section" data-tab="avanzado">
-        <div class="card"><div class="card-bd"><div class="card-hdr"><h3>Credenciales panel local</h3></div>
-          <div class="creds-i"><input type="text" id="locU" style="width:120px" placeholder="Usuario"><input type="text" id="locP" style="width:120px" placeholder="Contraseña">
-          <button class="btn btn-p btn-s" onclick="gCred()">Guardar</button></div></div></div>
-        <div class="card"><div class="card-bd"><div class="card-hdr"><h3>Ajustar RTC</h3></div>
-          <div class="rtc-i"><input type="number" id="rtcA" min="2020" max="2099" style="width:68px" placeholder="Año">
-          <input type="number" id="rtcM" min="1" max="12" style="width:54px" placeholder="Mes">
-          <input type="number" id="rtcD" min="1" max="31" style="width:54px" placeholder="Día">
-          <input type="number" id="rtcH" min="0" max="23" style="width:54px" placeholder="Hr">
-          <input type="number" id="rtcMin" min="0" max="59" style="width:54px" placeholder="Min">
-          <input type="number" id="rtcSeg" min="0" max="59" style="width:54px" placeholder="Seg">
-          <button class="btn btn-p btn-s" onclick="aRTC()">Ajustar hora</button></div></div></div>
-        <div class="card"><div class="card-bd"><div class="card-hdr"><h3>Historial de riegos</h3></div>
-          <div id="tRiegos" class="tw"><p class="empty">Sin datos</p></div></div></div>
+        <div class="card"><div class="card-bd"><div class="card-hdr"><h3>Credenciales de acceso al panel web local</h3></div>
+          <div class="creds-i">
+            <input type="text" id="locU" style="width:130px" placeholder="Usuario local">
+            <input type="text" id="locP" style="width:130px" placeholder="Contraseña local">
+            <button class="btn btn-p btn-s" onclick="gCred()">Guardar</button>
+            <button class="btn btn-d btn-s" onclick="gCredClear()">Eliminar</button>
+          </div>
+        </div></div>
+
+        <div class="card" id="cardRTC"><div class="card-bd"><div class="card-hdr"><h3>Sincronización de reloj (RTC)</h3></div>
+          <div id="rtcNotice" class="hidden" style="font-size:.85em;color:var(--g500);margin-bottom:8px">
+            ℹ️ Este dispositivo se sincroniza automáticamente por Internet vía <strong>NTP (UTC-5)</strong> en cada arranque y verificación periódica.
+          </div>
+          <div class="rtc-i" id="rtcControls">
+            <input type="number" id="rtcA" min="2020" max="2099" style="width:68px" placeholder="Año">
+            <input type="number" id="rtcM" min="1" max="12" style="width:54px" placeholder="Mes">
+            <input type="number" id="rtcD" min="1" max="31" style="width:54px" placeholder="Día">
+            <input type="number" id="rtcH" min="0" max="23" style="width:54px" placeholder="Hr">
+            <input type="number" id="rtcMin" min="0" max="59" style="width:54px" placeholder="Min">
+            <input type="number" id="rtcSeg" min="0" max="59" style="width:54px" placeholder="Seg">
+            <button class="btn btn-p btn-s" onclick="aRTC()">Ajustar RTC físico</button>
+          </div>
+        </div></div>
+
+        <div class="card"><div class="card-bd"><div class="card-hdr"><h3>Historial y registros de riego</h3></div>
+          <div id="tRiegos" class="tw"><p class="empty">Sin datos</p></div>
+        </div></div>
       </div>
 
     </div>
@@ -401,7 +522,17 @@ hr{border:none;border-top:1px solid var(--g200);margin:12px 0}
 <script>
 const _s = supabase.createClient('https://umhrvgfycdapogwywbmn.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtaHJ2Z2Z5Y2RhcG9nd3l3Ym1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MTcyOTEsImV4cCI6MjEwMDM5MzI5MX0.bU0Sho_fdSFqmb5pCc350npWUmHCWUHvJPH54C2nOwg');
 
-let chart, did = '', devices = [], rSel = 1, devCache = null;
+let chart, did = '', devices = [], rSel = 1, devCache = null, devFilter = 'all';
+
+// Estado de mantenimiento conocido por dispositivo (sobrevive recargas)
+let mantCache = (()=>{try{return JSON.parse(localStorage.getItem('mantEstado')||'{}')}catch(e){return{}}})();
+function mantOn(){return !!mantCache[did]}
+function pintarMant(){
+  const b=document.getElementById('mBtn');
+  if(!b)return;
+  b.textContent=mantOn()?'MANTENIMIENTO ON':'MANTENIMIENTO OFF';
+  b.className='btn '+(mantOn()?'btn-d':'btn-w');
+}
 
 // ─── TOAST ───
 function toast(msg, type='s'){
@@ -472,17 +603,131 @@ document.getElementById('themeBtn').onclick=()=>{
 };
 document.getElementById('themeBtn').textContent=ct==='dark'?'☀️':'🌙';
 
+function normTxt(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+
+function getTipoDispositivo(d){
+  if(!d)return '20torres';
+  if(d.tipo)return d.tipo;
+  const nom = (d.nombre||'').toLowerCase();
+  if(nom.includes('1 torre') || nom.includes('1torre')) return '1torre';
+  return '20torres';
+}
+
+function estadoEnLinea(d){
+  const q=new Date(d?.ultima_conexion).getTime();
+  if(!q||isNaN(q))return{S:'Sin datos',c:'dot',idx:3};
+  const m=(Date.now()-q)/6e4;
+  if(m<=5)return{S:'En línea',c:'dot ok',idx:0};
+  if(m<=30)return{S:'Inactivo',c:'dot warn',idx:1};
+  return{S:'Desconectado',c:'dot err',idx:2};
+}
+
+function etiquetaDev(d){
+  const t = getTipoDispositivo(d);
+  const icon = t === '1torre' ? '🗼' : '🌿';
+  return icon + ' ' + (d.nombre||'Sin nombre')+' · '+(d.mac?d.mac.slice(-8):'??');
+}
+
+function renderDevs(lista){
+  const sel=document.getElementById('selDevice');
+  const prev=sel.value||did;
+  const q=normTxt(document.getElementById('searchDev').value);
+  
+  // Actualizar conteos en chips
+  const countAll = lista.length;
+  const countTorres = lista.filter(d=>getTipoDispositivo(d)==='1torre').length;
+  const countTablas = lista.filter(d=>getTipoDispositivo(d)==='20torres').length;
+  document.getElementById('countAll').textContent = countAll;
+  document.getElementById('countTorre').textContent = countTorres;
+  document.getElementById('countTabla').textContent = countTablas;
+
+  const set=new Set();
+  const filtrados=lista.filter(d=>{
+    if(!d||set.has(d.id))return false;
+    set.add(d.id);
+    const tipo = getTipoDispositivo(d);
+    if(devFilter !== 'all' && tipo !== devFilter) return false;
+    if(!q)return true;
+    return normTxt(d.nombre).includes(q)||normTxt(d.mac||'').includes(q);
+  });
+
+  filtrados.sort((a,b)=>estadoEnLinea(a).idx-estadoEnLinea(b).idx||normTxt(a.nombre).localeCompare(normTxt(b.nombre)));
+  sel.innerHTML='';
+  
+  const actual=prev?lista.find(d=>d.id===prev):null;
+  const enFiltro=actual&&filtrados.some(d=>d.id===prev);
+  if(actual&&q&&!enFiltro){
+    const o=document.createElement('option');
+    o.value=actual.id;
+    o.textContent='(seleccionado) — '+etiquetaDev(actual);
+    sel.appendChild(o);
+  }
+
+  // Agrupación por tipo mediante optgroup
+  const groupTorres = document.createElement('optgroup');
+  groupTorres.label = '🗼 Torres Individuales (1 Torre)';
+  const groupTablas = document.createElement('optgroup');
+  groupTablas.label = '🌿 Sistemas de Tabla (Multi-Torres)';
+
+  let nTorres = 0, nTablas = 0;
+  filtrados.forEach(d=>{
+    const st=estadoEnLinea(d);
+    const tipo=getTipoDispositivo(d);
+    const o=document.createElement('option');
+    o.value=d.id;
+    o.textContent=('●').padStart(1,' ')+' '+st.S+' — '+etiquetaDev(d);
+    o.classList.add(st.idx===0?'opt-ok':st.idx===1?'opt-warn':'opt-err');
+    
+    if(tipo === '1torre') {
+      groupTorres.appendChild(o);
+      nTorres++;
+    } else {
+      groupTablas.appendChild(o);
+      nTablas++;
+    }
+  });
+
+  if(devFilter === 'all') {
+    if(nTorres > 0) sel.appendChild(groupTorres);
+    if(nTablas > 0) sel.appendChild(groupTablas);
+  } else if(devFilter === '1torre') {
+    if(nTorres > 0) sel.appendChild(groupTorres);
+  } else {
+    if(nTablas > 0) sel.appendChild(groupTablas);
+  }
+
+  if(!filtrados.length&&!actual){
+    const o=document.createElement('option');
+    o.value='';
+    o.textContent='Sin coincidencias';
+    sel.appendChild(o);
+  }
+  
+  if(prev){
+    for(const opt of sel.options){if(opt.value===prev){sel.value=prev;break}}
+  }
+}
+
 // ─── DB QUERIES (via RPC) ───
 async function cDevices(force){
-  if(devCache&&!force){devices=devCache;return}
+  if(devCache&&!force){devices=devCache;renderDevs(devices);return}
   const{data,error}=await _s.rpc('dashboard_dispositivos');
   if(error)throw error;
   devCache=data||[];devices=devCache;
-  const sel=document.getElementById('selDevice');sel.innerHTML='';
-  devices.forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=(d.nombre||'Sin nombre')+' ('+(d.mac?d.mac.slice(-8):'??')+')';sel.appendChild(o)});
+  renderDevs(devCache);
+  
+  const savedId = localStorage.getItem('last_selected_device');
+  if(!did && savedId && devices.some(d=>d.id===savedId)){
+    did = savedId;
+  }
+  if(did&&devices.length&&!(devices.find(d=>d.id===did)))did=devices[0].id;
   if(!did&&devices.length)did=devices[0].id;
-  if(did)sel.value=did;
+  if(did){
+    document.getElementById('selDevice').value=did;
+    localStorage.setItem('last_selected_device', did);
+  }
 }
+
 async function cUltima(){if(!did)return;const{data}=await _s.rpc('dashboard_ultima_lectura',{p_dispositivo_id:did});return data}
 async function cargarLecturas(d=1){if(!did)return[];const{data}=await _s.rpc('dashboard_lecturas',{p_dispositivo_id:did,p_dias:d});return data||[]}
 async function oConfig(){if(!did)return{};const{data}=await _s.rpc('dashboard_config',{p_dispositivo_id:did});const c={};(data||[]).forEach(r=>c[r.key]=r.value);return c}
@@ -492,6 +737,46 @@ async function oRiegos(){if(!did)return[];const{data}=await _s.rpc('dashboard_ri
 function fFecha(i){if(!i)return'---';return new Date(i).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 function tDesde(i){if(!i)return'';const s=Math.floor((Date.now()-new Date(i).getTime())/1e3);if(s<60)return'hace '+s+'s';if(s<3600)return'hace '+Math.floor(s/60)+'min';if(s<86400)return'hace '+Math.floor(s/3600)+'h';return'hace '+Math.floor(s/86400)+'d'}
 function eDispositivo(l){if(!l?.created_at)return{t:'Sin datos',c:'dot'};const m=(Date.now()-new Date(l.created_at).getTime())/6e4;if(m<=5)return{t:'En línea',c:'dot ok'};if(m<=30)return{t:'Inactivo',c:'dot warn'};return{t:'Desconectado',c:'dot err'}}
+
+// ─── LECTURAS HABILITADAS ───
+const LEC_DEF=[
+  {k:'humedad',l:'💧 Humedad suelo'},
+  {k:'tds',l:'🧪 TDS'},
+  {k:'temp',l:'🌡️ Temp ambiente'},
+  {k:'hum_amb',l:'💧 Hum ambiente'}
+];
+let lecState={humedad:true,tds:true,temp:true,hum_amb:true};
+
+async function oLecturas(){
+  const cfg=await oConfig();
+  const curDev = devices.find(d=>d.id===did);
+  const tipo = getTipoDispositivo(curDev);
+  const defVal = (tipo === '1torre') ? false : true;
+  
+  LEC_DEF.forEach(d=>lecState[d.k]=defVal);
+  LEC_DEF.forEach(d=>{
+    const v=cfg['lec_'+d.k];
+    if(v!=null)lecState[d.k]=v!=='0';
+  });
+}
+
+function renderLecturasUI(){
+  const div=document.getElementById('lecTgl');
+  div.innerHTML='';
+  LEC_DEF.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='lec-t '+(lecState[d.k]?'on':'');
+    b.innerHTML='<span class="sw"></span>'+d.l;
+    b.onclick=async()=>{
+      lecState[d.k]=!lecState[d.k];
+      renderLecturasUI();
+      await _s.rpc('dashboard_guardar_config',{p_dispositivo_id:did,p_key:'lec_'+d.k,p_value:lecState[d.k]?'1':'0'});
+      toast('Lectura '+(lecState[d.k]?'activada':'desactivada')+' · sincronizando con el dispositivo');
+    };
+    div.appendChild(b);
+  });
+  document.getElementById('lecHint').textContent='Activas: '+LEC_DEF.filter(d=>lecState[d.k]).map(d=>d.l).join(', ');
+}
 
 // ─── GAUGE ───
 function medidor(v,max,lb,cl,id){
@@ -511,52 +796,132 @@ function medidor(v,max,lb,cl,id){
   svg.innerHTML=h;
 }
 
-// ─── DASHBOARD UPDATE ───
+// ─── DASHBOARD UPDATE & ADAPTACIÓN SEGÚN TIPO ───
 function uDashboard(l){
-  const h=l?.humedad,td=l?.tds,on=l?.bomba_activa;
+  const curDev = devices.find(d=>d.id===did);
+  const tipo = getTipoDispositivo(curDev);
+  const isTorre = tipo === '1torre';
+
+  // Actualizar Banner y Badges
+  document.getElementById('bannerIcon').textContent = isTorre ? '🗼' : '🌿';
+  document.getElementById('bannerTitle').textContent = isTorre ? 'Torre Individual' : 'Sistema de Tabla / Multi-Torres';
+  document.getElementById('bannerDesc').textContent = isTorre 
+    ? 'Control de bomba y programación de horarios por ciclos de tiempo (sincronizado con NTP Colombia UTC-5).' 
+    : 'Monitoreo completo con sensores de solución nutritiva (TDS), humedad de sustrato, temperatura/humedad ambiental y reloj RTC.';
+  
+  const devBadge = document.getElementById('devBadge');
+  devBadge.innerHTML = '<span class="badge-tipo '+(isTorre?'torre':'tabla')+'">'+(isTorre?'🗼 1 Torre':'🌿 Tabla')+'</span> '+(curDev?.nombre||'Sin nombre');
+
+  // Adaptación de paneles de configuración y RTC
+  document.getElementById('cfgTorreNotice').classList.toggle('hidden', !isTorre);
+  document.getElementById('cfgRowU').style.display = isTorre ? 'none' : 'flex';
+  document.getElementById('cfgRowI').style.display = isTorre ? 'none' : 'flex';
+  document.getElementById('cfgRowT').style.display = isTorre ? 'none' : 'flex';
+  document.getElementById('rtcNotice').classList.toggle('hidden', !isTorre);
+  document.getElementById('rtcControls').style.display = isTorre ? 'none' : 'flex';
+
+  // Ocultar o mostrar tarjetas de sensores en Resumen
+  const vis=(id,on)=>{const el=document.getElementById(id);const c=el?.closest('.mc');if(c)c.style.display=on?'':'none'};
+  vis('gHum',lecState.humedad);
+  vis('gTds',lecState.tds);
+  vis('gTemp',lecState.temp);
+  vis('gHumA',lecState.hum_amb);
+
+  const haySensoresActivos = lecState.humedad || lecState.tds || lecState.temp || lecState.hum_amb;
+  document.getElementById('sensorGrid').style.display = haySensoresActivos ? 'flex' : 'none';
+
+  const h=lecState.humedad?l?.humedad:null,td=lecState.tds?l?.tds:null;
   medidor(h??null,100,'%','#16a34a','gHum');
   medidor(td??null,td!=null?Math.max(td*2,2000):2000,'ppm','#2563eb','gTds');
-  const e=document.getElementById('vBomba');
+  medidor(lecState.temp&&l?.temperatura!=null?l.temperatura:null,50,'°C','#f59e0b','gTemp');
+  medidor(lecState.hum_amb&&l?.hum_ambiente!=null?l.hum_ambiente:null,100,'%','#0284c7','gHumA');
+  
+  const on=l?.bomba_activa,e=document.getElementById('vBomba');
   e.textContent=on?'ENCENDIDA':'APAGADA';e.className='val '+(on?'on':'off');
   document.getElementById('bDet').innerHTML='<span class="pulse-dot '+(on?'on':'off')+'"></span> Motivo: '+(l?.motivo||'---');
+  
   const rd=l?.created_at;
   if(rd){document.getElementById('vRiego').textContent=fFecha(rd);document.getElementById('rSub').textContent=tDesde(rd)}
   else{document.getElementById('vRiego').textContent='---';document.getElementById('rSub').textContent='Sin registros'}
+  
   const ts=rd?fFecha(rd)+' ('+tDesde(rd)+')':'---';
   document.getElementById('ultUpd').textContent='Última: '+ts;
+  
   const es=eDispositivo(l);
   document.getElementById('devStText').textContent=es.t;
   document.querySelector('.dev-st .dot').className=es.c;
-  document.getElementById('devBadge').textContent=devices.find(d=>d.id===did)?.nombre||'Sin nombre';
+  
   const ol=es.t==='En línea';
   document.getElementById('bBtn').disabled=!ol;document.getElementById('mBtn').disabled=!ol;
   document.getElementById('bBtn').textContent=on?'APAGAR BOMBA':'ENCENDER BOMBA';
+  pintarMant();
 }
 
 // ─── CHART ───
+function agruparLecturas(ls,dias){
+  if(!ls.length)return [];
+  const paso=dias<=1?300000:dias<=7?3600000:dias<=30?21600000:86400000;
+  const t0=new Date('2000-01-01').getTime();
+  const grupos=new Map();
+  ls.forEach(l=>{
+    const t=new Date(l.created_at).getTime();
+    const b=Math.floor((t-t0)/paso);
+    let g=grupos.get(b);
+    if(!g){g={t:Math.floor((t-t0)/paso)*paso+t0,hum:[],tds:[],temp:[],humA:[]};grupos.set(b,g)}
+    if(l.humedad!=null)g.hum.push(l.humedad);
+    if(l.tds!=null)g.tds.push(l.tds);
+    if(l.temperatura!=null)g.temp.push(l.temperatura);
+    if(l.hum_ambiente!=null)g.humA.push(l.hum_ambiente);
+  });
+  const med=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
+  return [...grupos.values()].sort((a,b)=>a.t-b.t).map(g=>({
+    created_at:new Date(g.t).toISOString(),
+    humedad:med(g.hum),tds:med(g.tds),temperatura:med(g.temp),hum_ambiente:med(g.humA)
+  }));
+}
+
 function fLbl(iso,d){const dt=new Date(iso);if(d<=1)return dt.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});if(d<=7)return dt.toLocaleString('es-AR',{weekday:'short',hour:'2-digit'});return dt.toLocaleString('es-AR',{day:'2-digit',month:'short'})}
+
 function gLecturas(lecturas,dias){
   const cv=document.getElementById('chartL'),ctx=cv.getContext('2d');
+  const ph=document.getElementById('chartPlaceholder');
   if(chart)chart.destroy();
-  if(!lecturas.length){ctx.clearRect(0,0,cv.width,cv.height);return}
-  const lb=lecturas.map(l=>fLbl(l.created_at,dias)),hum=lecturas.map(l=>l.humedad),tds=lecturas.map(l=>l.tds);
+  
+  const pts=agruparLecturas(lecturas,dias);
+  const showH=lecState.humedad&&pts.some(l=>l.humedad!=null);
+  const showT=lecState.tds&&pts.some(l=>l.tds!=null);
+
+  if(!pts.length || (!showH && !showT)){
+    cv.style.display='none';
+    ph.classList.remove('hidden');
+    return;
+  }
+  cv.style.display='block';
+  ph.classList.add('hidden');
+
+  const lb=pts.map(l=>fLbl(l.created_at,dias)),hum=pts.map(l=>l.humedad),tds=pts.map(l=>l.tds);
   const dr=document.documentElement.classList.contains('dark'),cc=dr?'#8a9a8a':'#88a088',gc=dr?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
   const ch=cv.parentElement?.offsetHeight||280;
+
   const gh=ctx.createLinearGradient(0,0,0,ch);gh.addColorStop(0,dr?'rgba(34,197,94,.25)':'rgba(22,101,52,.3)');gh.addColorStop(1,dr?'rgba(34,197,94,.02)':'rgba(22,101,52,.02)');
   const gt=ctx.createLinearGradient(0,0,0,ch);gt.addColorStop(0,dr?'rgba(96,165,250,.25)':'rgba(37,99,235,.3)');gt.addColorStop(1,dr?'rgba(96,165,250,.02)':'rgba(37,99,235,.02)');
-  const mt=Math.max(...tds,100);
+  const ds=[];
+  if(showH)ds.push({label:'Humedad %',data:hum,borderColor:dr?'#22c55e':'#166534',backgroundColor:gh,fill:true,yAxisID:'y',tension:.3,pointRadius:dias<=7?2:1,pointHoverRadius:5,borderWidth:2});
+  if(showT)ds.push({label:'TDS ppm',data:tds,borderColor:dr?'#60a5fa':'#2563eb',backgroundColor:gt,fill:true,yAxisID:showH?'y1':'y',tension:.3,pointRadius:dias<=7?2:1,pointHoverRadius:5,borderWidth:2});
+  const sc={x:{grid:{display:false},ticks:{maxTicksLimit:dias<=1?8:dias<=7?14:12,font:{family:'Inter',size:10},color:cc}}};
+  if(showH)sc.y={beginAtZero:true,max:100,title:{display:true,text:'Humedad %',font:{family:'Inter',size:11},color:cc},grid:{color:gc},ticks:{font:{family:'Inter',size:10},color:cc}};
+  if(showT){
+    const validT=tds.filter(v=>v!=null);
+    const mt=validT.length?validT.reduce((a,b)=>Math.max(a,b),100):100;
+    if(showH)sc.y1={position:'right',beginAtZero:true,max:mt*1.15,title:{display:true,text:'TDS ppm',font:{family:'Inter',size:11},color:cc},grid:{drawOnChartArea:false},ticks:{font:{family:'Inter',size:10},color:cc}};
+    else sc.y={beginAtZero:true,max:mt*1.15,title:{display:true,text:'TDS ppm',font:{family:'Inter',size:11},color:cc},grid:{color:gc},ticks:{font:{family:'Inter',size:10},color:cc}}
+  }
   chart=new Chart(ctx,{
-    type:'line',data:{labels:lb,datasets:[{label:'Humedad %',data:hum,borderColor:dr?'#22c55e':'#166534',backgroundColor:gh,fill:true,yAxisID:'y',tension:.3,pointRadius:dias<=7?2:1,pointHoverRadius:5,borderWidth:2},{label:'TDS ppm',data:tds,borderColor:dr?'#60a5fa':'#2563eb',backgroundColor:gt,fill:true,yAxisID:'y1',tension:.3,pointRadius:dias<=7?2:1,pointHoverRadius:5,borderWidth:2}]},
+    type:'line',data:{labels:lb,datasets:ds},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:16,font:{family:'Inter',size:12},color:cc}},
         tooltip:{backgroundColor:dr?'rgba(20,25,20,.95)':'rgba(26,33,26,.92)',titleFont:{family:'Inter',size:12},bodyFont:{family:'Inter',size:12},padding:10,cornerRadius:6,displayColors:true}},
-      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:dias<=1?8:dias<=7?14:12,font:{family:'Inter',size:10},color:cc}},
-        y:{beginAtZero:true,max:100,title:{display:true,text:'Humedad %',font:{family:'Inter',size:11},color:cc},grid:{color:gc},ticks:{font:{family:'Inter',size:10},color:cc}},
-        y1:{position:'right',beginAtZero:true,max:mt*1.15,title:{display:true,text:'TDS ppm',font:{family:'Inter',size:11},color:cc},grid:{drawOnChartArea:false},ticks:{font:{family:'Inter',size:10},color:cc}}}}});
-  const sd=document.getElementById('cStats')||function(){const d=document.createElement('div');d.id='cStats';d.className='chart-st';document.querySelector('.chart-c .card-bd').after(d);return d}();
-  const ha=(hum.reduce((a,b)=>a+b,0)/hum.length).toFixed(1),hn=Math.min(...hum).toFixed(1),hx=Math.max(...hum).toFixed(1);
-  const ta=(tds.reduce((a,b)=>a+b,0)/tds.length).toFixed(0),tn=Math.min(...tds).toFixed(0),tx=Math.max(...tds).toFixed(0);
-  sd.innerHTML='<span>💧 Humedad: <strong>'+ha+'%</strong> (min '+hn+'% · máx '+hx+'%)</span><span>🧪 TDS: <strong>'+ta+' ppm</strong> (min '+tn+' · máx '+tx+')</span><span>📊 Puntos: <strong>'+lecturas.length+'</strong></span>';
+      scales:sc}});
 }
 async function aLecturas(){const r=await cargarLecturas(rSel);gLecturas(r,rSel)}
 
@@ -567,28 +932,68 @@ document.querySelectorAll('.rng-btn').forEach(b=>{
 // ─── HORARIOS / RIEGOS ───
 async function aHorarios(){
   const h=await oHorarios(),div=document.getElementById('lHorarios');
-  if(!h.length){div.innerHTML='<p class="empty">Sin horarios</p>';return}
-  let ht='<table>';
-  h.forEach(x=>{const hh=String(x.hora).padStart(2,'0'),mm=String(x.minuto).padStart(2,'0');ht+='<tr><td>'+hh+':'+mm+'</td><td>'+(x.duracion_ms/1000)+'s</td><td><button class="btn btn-d btn-s" onclick="eHorario('+x.id+')">×</button></td></tr>'});
-  ht+='</table>';div.innerHTML=ht;
+  if(!h.length){div.innerHTML='<p class="empty">Sin horarios configurados</p>';return}
+  let ht='<table><thead><tr><th>Hora</th><th>Duración</th><th>Acción</th></tr></thead><tbody>';
+  h.forEach(x=>{
+    const hh=String(x.hora).padStart(2,'0'),mm=String(x.minuto).padStart(2,'0');
+    ht+='<tr><td><strong>'+hh+':'+mm+'</strong></td><td>'+(x.duracion_ms/1000)+'s</td><td><button class="btn btn-d btn-s" onclick="eHorario('+x.id+')">Eliminar</button></td></tr>';
+  });
+  ht+='</tbody></table>';div.innerHTML=ht;
 }
+
 async function aRiegos(){
   const r=await oRiegos(),div=document.getElementById('tRiegos');
-  if(!r.length){div.innerHTML='<p class="empty">Sin datos</p>';return}
-  let rt='<table><tr><th>Fecha</th><th>Evento</th><th>Duración</th></tr>';
+  if(!r.length){div.innerHTML='<p class="empty">Sin registros de riego</p>';return}
+  let rt='<table><thead><tr><th>Fecha / Hora</th><th>Evento / Motivo</th><th>Duración</th></tr></thead><tbody>';
   r.forEach(x=>rt+='<tr><td>'+fFecha(x.created_at)+'</td><td>'+(x.evento||x.motivo||'---')+'</td><td>'+(x.duracion_ms?(x.duracion_ms/1000)+'s':'---')+'</td></tr>');
-  rt+='</table>';div.innerHTML=rt;
+  rt+='</tbody></table>';div.innerHTML=rt;
 }
 
 // ─── COMMANDS (via RPC) ───
-window.cBomba=async function(){if(!did)return;const on=document.getElementById('bBtn').textContent.includes('ENCENDER');const btn=document.getElementById('bBtn');btn.disabled=true;await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'bomba',p_parametros:{on}});btn.textContent='🔄 Enviado...';setTimeout(()=>{btn.textContent=on?'APAGAR BOMBA':'ENCENDER BOMBA';btn.disabled=false},2000);toast(on?'Bomba encendida':'Bomba apagada')};
-window.tMant=async function(){if(!did)return;const btn=document.getElementById('mBtn'),act=btn.textContent.includes('OFF');await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'mantenimiento',p_parametros:{on:act}});btn.textContent='🔄...';setTimeout(()=>{btn.textContent=act?'MANTENIMIENTO ON':'MANTENIMIENTO OFF';btn.className='btn '+(act?'btn-d':'btn-w');toast(act?'Mantenimiento activado':'Mantenimiento desactivado')},2000)};
-window.cReset=async function(){if(!did)return;showModal('🔄','¿Reiniciar el ESP32?',[{label:'Cancelar',small:true},{label:'Reiniciar',danger:true,action:async()=>{await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'reset',p_parametros:{}});toast('Comando de reset enviado','s')}}])};
-window.gConfig=async function(){if(!did)return;const p=[{key:'umbral',value:document.getElementById('cfgU').value},{key:'intervalo',value:document.getElementById('cfgI').value},{key:'duracion',value:document.getElementById('cfgD').value},{key:'tds_cal',value:document.getElementById('cfgT').value}];for(const x of p){await _s.rpc('dashboard_guardar_config',{p_dispositivo_id:did,p_key:x.key,p_value:x.value})}await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'config',p_parametros:{umbral:+p[0].value,intervalo:+p[1].value,duracion:+p[2].value,tds_cal:+p[3].value}});toast('Configuración guardada')};
-window.aHorario=async function(){if(!did)return;const h=+document.getElementById('schH').value,m=+document.getElementById('schM').value,d=+document.getElementById('schD').value;if(isNaN(h)||isNaN(m)||isNaN(d))return toast('Completá hora, minuto y duración','e');await _s.rpc('dashboard_crear_horario',{p_dispositivo_id:did,p_hora:h,p_minuto:m,p_duracion_ms:d*1e3});document.getElementById('schH').value='';document.getElementById('schM').value='';document.getElementById('schD').value='';aHorarios();toast('Horario agregado')};
-window.gCred=async function(){if(!did)return;const u=document.getElementById('locU').value,p=document.getElementById('locP').value;if(!u||!p)return toast('Completá usuario y contraseña','e');for(const x of[{key:'local_user',value:u},{key:'local_pass',value:p}]){await _s.rpc('dashboard_guardar_config',{p_dispositivo_id:did,p_key:x.key,p_value:x.value})}document.getElementById('locU').value='';document.getElementById('locP').value='';toast('Credenciales guardadas')};
-window.aRTC=async function(){if(!did)return;const p={anio:+document.getElementById('rtcA').value||2026,mes:+document.getElementById('rtcM').value||1,dia:+document.getElementById('rtcD').value||1,hora:+document.getElementById('rtcH').value||0,minuto:+document.getElementById('rtcMin').value||0,segundo:+document.getElementById('rtcSeg').value||0};await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'rtc',p_parametros:p});toast('Comando RTC enviado')};
-window.eHorario=async function(id){showModal('🗑️','¿Eliminar horario?',[{label:'Cancelar',small:true},{label:'Eliminar',danger:true,action:async()=>{await _s.rpc('dashboard_eliminar_horario',{p_id:id});aHorarios();toast('Horario eliminado')}}])};
+window.cBomba=async function(){if(!did)return;const on=document.getElementById('bBtn').textContent.includes('ENCENDER');const btn=document.getElementById('bBtn');btn.disabled=true;await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'bomba',p_parametros:{on}});btn.textContent='🔄 Enviado...';setTimeout(()=>{btn.textContent=on?'APAGAR BOMBA':'ENCENDER BOMBA';btn.disabled=false},2000);toast(on?'Comando: Encender bomba enviado':'Comando: Apagar bomba enviado')};
+window.tMant=async function(){
+  if(!did)return;
+  const btn=document.getElementById('mBtn');
+  // Estado real conocido del mantenimiento (por dispositivo), no el texto del boton
+  const nuevo=!mantOn();
+  btn.disabled=true;btn.textContent='🔄...';
+  try{
+    await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'mantenimiento',p_parametros:{on:nuevo}});
+    mantCache[did]=nuevo;
+    localStorage.setItem('mantEstado',JSON.stringify(mantCache));
+    pintarMant();
+    toast(nuevo?'Mantenimiento activado · se aplica en ~15-60 s':'Mantenimiento desactivado · se aplica en ~15-60 s');
+  }catch(e){toast('Error enviando el comando','e')}
+  setTimeout(()=>{btn.disabled=false},1500);
+};
+window.cReset=async function(){if(!did)return;showModal('🔄','¿Reiniciar el controlador ESP32 de este dispositivo?',[{label:'Cancelar',small:true},{label:'Reiniciar',danger:true,action:async()=>{await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'reset',p_parametros:{}});toast('Comando de reinicio enviado','s')}}])};
+window.gConfig=async function(){
+  if(!did)return;
+  const p=[
+    {key:'umbral',value:document.getElementById('cfgU').value},
+    {key:'intervalo',value:document.getElementById('cfgI').value},
+    {key:'duracion',value:document.getElementById('cfgD').value},
+    {key:'tds_cal',value:document.getElementById('cfgT').value}
+  ];
+  for(const x of p){
+    if(x.value) await _s.rpc('dashboard_guardar_config',{p_dispositivo_id:did,p_key:x.key,p_value:x.value});
+  }
+  await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'config',p_parametros:{umbral:+p[0].value,intervalo:+p[1].value,duracion:+p[2].value,tds_cal:+p[3].value}});
+  toast('Configuración guardada y sincronizada');
+};
+window.aHorario=async function(){
+  if(!did)return;
+  const h=+document.getElementById('schH').value,m=+document.getElementById('schM').value,d=+document.getElementById('schD').value;
+  if(isNaN(h)||isNaN(m)||isNaN(d)||h<0||h>23||m<0||m>59||d<=0)return toast('Ingresa una hora (0-23), minuto (0-59) y duración válida','e');
+  await _s.rpc('dashboard_crear_horario',{p_dispositivo_id:did,p_hora:h,p_minuto:m,p_duracion_ms:d*1e3});
+  document.getElementById('schH').value='';document.getElementById('schM').value='';document.getElementById('schD').value='';
+  await aHorarios();
+  toast('Horario de riego agregado');
+};
+window.gCred=async function(){if(!did)return;const u=document.getElementById('locU').value,p=document.getElementById('locP').value;if(!u||!p)return toast('Completá usuario y contraseña','e');await _s.rpc('dashboard_guardar_credenciales',{p_dispositivo_id:did,p_panel_user:u,p_panel_pass:p});document.getElementById('locU').value='';document.getElementById('locP').value='';toast('Credenciales guardadas')};
+window.gCredClear=async function(){if(!did)return;showModal('🔒','¿Eliminar credenciales del panel local?',[{label:'Cancelar',small:true},{label:'Eliminar',danger:true,action:async()=>{await _s.rpc('dashboard_borrar_credenciales',{p_dispositivo_id:did});document.getElementById('locU').value='';document.getElementById('locP').value='';toast('Credenciales eliminadas · el dispositivo aplicará el cambio en hasta 1 min','s')}}])};
+window.aRTC=async function(){if(!did)return;const p={anio:+document.getElementById('rtcA').value||2026,mes:+document.getElementById('rtcM').value||1,dia:+document.getElementById('rtcD').value||1,hora:+document.getElementById('rtcH').value||0,minuto:+document.getElementById('rtcMin').value||0,segundo:+document.getElementById('rtcSeg').value||0};await _s.rpc('dashboard_enviar_comando',{p_dispositivo_id:did,p_comando:'rtc',p_parametros:p});toast('Comando de ajuste RTC enviado')};
+window.eHorario=async function(id){showModal('🗑️','¿Eliminar este horario de riego?',[{label:'Cancelar',small:true},{label:'Eliminar',danger:true,action:async()=>{await _s.rpc('dashboard_eliminar_horario',{p_id:id});await aHorarios();toast('Horario eliminado')}}])};
 
 // ─── LOAD ───
 async function cargarTodo(){
@@ -597,8 +1002,15 @@ async function cargarTodo(){
     document.getElementById('app').classList.add('hidden');
     await cDevices();
     did=document.getElementById('selDevice').value;
+    if(!did){
+      document.getElementById('loading').innerHTML='<div style="color:var(--w)">No hay dispositivos registrados en Supabase.</div>';
+      return;
+    }
+    localStorage.setItem('last_selected_device', did);
     const[lec,cfg]=await Promise.all([cUltima(),oConfig()]);
+    await oLecturas();
     uDashboard(lec);
+    renderLecturasUI();
     if(cfg.umbral)document.getElementById('cfgU').value=cfg.umbral;
     if(cfg.intervalo)document.getElementById('cfgI').value=cfg.intervalo;
     if(cfg.duracion)document.getElementById('cfgD').value=cfg.duracion;
@@ -606,9 +1018,32 @@ async function cargarTodo(){
     await Promise.all([aLecturas(),aHorarios(),aRiegos()]);
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
-  }catch(e){document.getElementById('loading').innerHTML='<div style="color:var(--d)">Error: '+e.message+'</div><button class="btn btn-p btn-s" onclick="cargarTodo()">Reintentar</button>'}
+  }catch(e){
+    document.getElementById('loading').innerHTML='<div style="color:var(--d);font-weight:600">Error de conexión: '+e.message+'</div><button class="btn btn-p btn-s" style="margin-top:12px" onclick="cargarTodo()">Reintentar</button>';
+  }
 }
 
+// Eventos de Chips de Filtro
+document.querySelectorAll('.dev-chips .chip').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.dev-chips .chip').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    devFilter = btn.dataset.filter;
+    renderDevs(devices);
+    const sel = document.getElementById('selDevice');
+    if(sel.value && sel.value !== did){
+      did = sel.value;
+      cargarTodo();
+    }
+  };
+});
+
+document.getElementById('searchDev').addEventListener('input',()=>renderDevs(devices));
+document.getElementById('clearSearch').addEventListener('click',function(){
+  document.getElementById('searchDev').value='';
+  renderDevs(devices);
+  document.getElementById('searchDev').focus();
+});
 document.getElementById('selDevice').onchange=cargarTodo;
 window.cargarTodo=cargarTodo;
 
